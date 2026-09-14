@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đấu Trường Kéo Co Trắc Nghiệm - 2 Đội Đối Kháng</title>
+    <meta name="description" content="Trò chơi kéo co trắc nghiệm đối kháng 2 đội thi đấu với hoạt họa kéo dây sinh động, hiệu ứng âm thanh và câu hỏi trắc nghiệm A B C D." />
+    <meta property="og:title" content="Đấu Trường Kéo Co Trắc Nghiệm" />
+    <meta property="og:description" content="Trò chơi kéo co trắc nghiệm đối kháng 2 đội thi đấu với hoạt họa kéo dây sinh động, hiệu ứng âm thanh và câu hỏi trắc nghiệm A B C D." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <!-- Confetti Canvas for Victory -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="app-container">
+      <!-- HEADER -->
+      <header>
+        <div class="badge-tag">
+          <span>⚔️</span>
+          <span>Trò Chơi Đối Kháng Kéo Co Trắc Nghiệm</span>
+        </div>
+        <h1 class="app-title">
+          <span>ĐẤU TRƯỜNG KÉO CO TRẮC NGHIỆM</span>
+        </h1>
+        <p class="app-subtitle">
+          Mỗi đội 10 câu trắc nghiệm. Trả lời sai bị đối thủ kéo cờ về phía họ; trả lời đúng giật cờ về phía mình!
+        </p>
+      </header>
+
+      <!-- SCOREBOARD -->
+      <div class="scoreboard">
+        <!-- Đội 1 (Đỏ) -->
+        <div class="score-team">
+          <span class="score-dot dot-red"></span>
+          <div>
+            <div class="team-badge-title team1-text">Đội 1 (Đỏ)</div>
+            <div class="score-numbers">
+              <span id="t1-score-display" class="score-correct">0 đúng</span> · 
+              <span id="t1-wrong-display" class="score-wrong">0 sai</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Turn Indicator -->
+        <div class="scoreboard-center">
+          <span id="match-turn-pill" class="turn-pill team1-turn">LƯỢT: ĐỘI 1 (ĐỎ)</span>
+        </div>
+
+        <!-- Đội 2 (Xanh) -->
+        <div class="score-team">
+          <div style="text-align: right;">
+            <div class="team-badge-title team2-text">Đội 2 (Xanh)</div>
+            <div class="score-numbers">
+              <span id="t2-score-display" class="score-correct">0 đúng</span> · 
+              <span id="t2-wrong-display" class="score-wrong">0 sai</span>
+            </div>
+          </div>
+          <span class="score-dot dot-blue"></span>
+        </div>
+
+        <!-- Controls -->
+        <div class="control-btn-group">
+          <button type="button" class="icon-btn" id="sound-toggle-btn" onclick="toggleSound()" title="Bật/Tắt âm thanh">
+            🔊 Âm thanh: Bật
+          </button>
+          <button type="button" class="icon-btn" onclick="openQuestionEditor()" title="Chỉnh sửa bộ 20 câu hỏi">
+            ✏️ Soạn câu hỏi
+          </button>
+          <button type="button" class="icon-btn" onclick="openSettingsModal()" title="Cài đặt luật kéo co">
+            ⚙️ Cài đặt
+          </button>
+          <button type="button" class="icon-btn" onclick="resetGame()" title="Chơi lại ván mới">
+            🔄 Chơi lại
+          </button>
+        </div>
+      </div>
+
+      <!-- MOBILE VIEW SWITCHER (< 768px) -->
+      <div class="mobile-tabs" id="mobile-tabs-bar">
+        <div class="tab-nav">
+          <button type="button" id="tab-btn-m-team1" onclick="setMobileTab('team1')">🔴 Bảng Đội 1</button>
+          <button type="button" id="tab-btn-m-arena" onclick="setMobileTab('arena')">⚔️ Sân Kéo Co</button>
+          <button type="button" id="tab-btn-m-team2" onclick="setMobileTab('team2')">🔵 Bảng Đội 2</button>
+          <button type="button" id="tab-btn-m-all" class="active-all" onclick="setMobileTab('all')">Tất cả</button>
+        </div>
+      </div>
+
+      <!-- 3-COLUMN MAIN BATTLEFIELD:
+           [BẢNG CÂU HỎI ĐỘI 1]  ---  [ĐẤU TRƯỜNG KÉO CO]  ---  [BẢNG CÂU HỎI ĐỘI 2]
+      -->
+      <div class="battlefield-grid">
+        <!-- LEFT SIDE: BẢNG CÂU HỎI ĐỘI 1 (ĐỎ) -->
+        <div class="question-card card-team1" id="card-team1">
+          <div class="card-top-banner banner-team1">
+            <span>📍 BẢNG ĐỘI 1 (BÊN TRÁI)</span>
+            <span>KÉO CỜ SANG TRÁI ⬅️</span>
+          </div>
+          <div class="card-inner">
+            <div class="card-header-bar">
+              <div class="team-info-block">
+                <h3 class="team1-text">Đội 1 (Đỏ)</h3>
+                <span class="progress-text" id="t1-progress-text">Câu 1 / 10</span>
+              </div>
+              <span class="turn-status-badge badge-active-t1" id="t1-status-badge">ĐANG LƯỢT THI</span>
+            </div>
+            <!-- Dynamic Question & Options Container -->
+            <div id="t1-content-box" style="flex: 1; display: flex; flex-direction: column;"></div>
+            <div class="card-footer-rule">
+              <span>Đúng: Kéo cờ về mình</span>
+              <span>Sai: Bị đối thủ kéo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: ĐẤU TRƯỜNG KÉO CO Ở GIỮA -->
+        <div class="center-arena-wrapper" id="center-arena">
+          <div class="arena-stadium">
+            <!-- Top Stadium Indicators -->
+            <div class="arena-header-status">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="score-dot dot-red"></span>
+                <span class="team1-text">ĐỘI 1 (ĐỎ)</span>
+              </div>
+              <div class="flag-position-indicator" id="flag-meter-text">
+                ⚖️ Vạch giữa (0%)
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="team2-text">ĐỘI 2 (XANH)</span>
+                <span class="score-dot dot-blue"></span>
+              </div>
+            </div>
+
+            <!-- Tension Gauge Bar -->
+            <div class="tension-bar">
+              <div class="tension-red" id="tension-red" style="width: 50%;"></div>
+              <div class="tension-center-line"></div>
+              <div class="tension-blue" id="tension-blue" style="width: 50%;"></div>
+            </div>
+
+            <!-- Action Alert Banner -->
+            <div class="action-alert" id="action-alert-box"></div>
+
+            <!-- Playfield Arena Graphic -->
+            <div class="playfield">
+              <div class="grass-ground">
+                <div class="mud-hole">
+                  <span class="mud-text">Vũng Bùn Nguy Hiểm</span>
+                </div>
+                <div class="center-win-line"></div>
+                <div class="win-limit-left">
+                  <span>VẠCH THẮNG ĐỘI 1</span>
+                </div>
+                <div class="win-limit-right">
+                  <span>VẠCH THẮNG ĐỘI 2</span>
+                </div>
+              </div>
+
+              <!-- Animated Shift Carrier for Characters & Rope -->
+              <div class="shift-carrier" id="shift-carrier">
+                <!-- Squad 1 (3 Athletes pulling Left) -->
+                <div class="team-squad squad-t1" id="squad-team1"></div>
+
+                <!-- Rope and Center Ribbon -->
+                <div class="rope-assembly">
+                  <div class="thick-rope">
+                    <div class="center-flag-tie" id="center-flag-tie">
+                      <div class="gold-ring"></div>
+                      <div class="red-flag-ribbon">🚩</div>
+                      <span class="flag-label-chip">CỜ KÉO CO</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Squad 2 (3 Athletes pulling Right) -->
+                <div class="team-squad squad-t2" id="squad-team2"></div>
+              </div>
+            </div>
+
+            <!-- Distance Legend -->
+            <div class="arena-distance-legend">
+              <span class="team1-text">← Vạch đích Đội 1 (Thắng)</span>
+              <span style="font-family: monospace; background: white; padding: 1px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">0m Xuất phát</span>
+              <span class="team2-text">Vạch đích Đội 2 (Thắng) →</span>
+            </div>
+          </div>
+
+          <!-- Arena Turn & Mode Control Bar -->
+          <div class="arena-control-bar">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-weight: 800; color: #64748b;">Lượt đấu:</span>
+              <div class="turn-switch-buttons">
+                <button type="button" class="turn-btn active-t1" id="turn-btn-t1" onclick="switchTurnManually('team1')">
+                  🔴 Đội 1
+                </button>
+                <button type="button" class="turn-btn" id="turn-btn-t2" onclick="switchTurnManually('team2')">
+                  🔵 Đội 2
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="mode-toggle-btn" onclick="toggleGameMode()" title="Chuyển chế độ chơi">
+              <span>⇄</span>
+              <span id="mode-toggle-text">Đấu Luân Phiên (Theo lượt)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE: BẢNG CÂU HỎI ĐỘI 2 (XANH) -->
+        <div class="question-card card-team2" id="card-team2">
+          <div class="card-top-banner banner-team2">
+            <span>📍 BẢNG ĐỘI 2 (BÊN PHẢI)</span>
+            <span>➡️ KÉO CỜ SANG PHẢI</span>
+          </div>
+          <div class="card-inner">
+            <div class="card-header-bar">
+              <div class="team-info-block">
+                <h3 class="team2-text">Đội 2 (Xanh)</h3>
+                <span class="progress-text" id="t2-progress-text">Câu 1 / 10</span>
+              </div>
+              <span class="turn-status-badge badge-waiting" id="t2-status-badge">Chờ lượt</span>
+            </div>
+            <!-- Dynamic Question & Options Container -->
+            <div id="t2-content-box" style="flex: 1; display: flex; flex-direction: column;"></div>
+            <div class="card-footer-rule">
+              <span>Đúng: Kéo cờ về mình</span>
+              <span>Sai: Bị đối thủ kéo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer>
+        <div class="rule-legend-item">
+          <span class="color-dot dot-green"></span>
+          <span>Trả lời đúng: Kéo cờ về phía đội mình 18%</span>
+        </div>
+        <div class="rule-legend-item">
+          <span class="color-dot dot-red-small"></span>
+          <span>Trả lời sai: Bị đối phương giật cờ về phía họ 18%</span>
+        </div>
+        <div>Tự hào xây dựng với 100% HTML5, CSS3 và Vanilla JavaScript</div>
+      </footer>
+    </div>
+
+    <!-- =========================================================
+         VICTORY MODAL
+         ========================================================= -->
+    <div class="modal-overlay" id="victory-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>KẾT THÚC TRẬN ĐẤU KÉO CO</h3>
+          <button type="button" class="close-modal-btn" onclick="closeVictoryModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="victory-trophy">🏆</div>
+          <h2 class="victory-title" id="victory-winner-title">ĐỘI CHIẾN THẮNG!</h2>
+          <p class="victory-desc" id="victory-desc-text">Mô tả lý do chiến thắng</p>
+
+          <div class="match-stats-grid">
+            <div class="stat-card stat-t1">
+              <div style="font-size: 11px; font-weight: 800; color: #dc2626; text-transform: uppercase;">Đội 1 (Đỏ)</div>
+              <div style="font-size: 16px; font-weight: 900; margin-top: 4px;" id="modal-t1-stat">0 đúng / 0 sai</div>
+            </div>
+            <div class="stat-card stat-t2">
+              <div style="font-size: 11px; font-weight: 800; color: #2563eb; text-transform: uppercase;">Đội 2 (Xanh)</div>
+              <div style="font-size: 16px; font-weight: 900; margin-top: 4px;" id="modal-t2-stat">0 đúng / 0 sai</div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-primary" onclick="resetGame()">
+            🔄 Bắt Đầu Ván Mới
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         QUESTION EDITOR MODAL (SOẠN CÂU HỎI)
+         ========================================================= -->
+    <div class="modal-overlay" id="editor-modal">
+      <div class="modal-dialog" style="max-width: 650px;">
+        <div class="modal-header">
+          <h3>✏️ SOẠN BỘ CÂU HỎI TRẮC NGHIỆM</h3>
+          <button type="button" class="close-modal-btn" onclick="closeQuestionEditor()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="editor-team-tabs">
+            <button type="button" class="editor-tab-btn active-tab" id="tab-btn-t1" onclick="switchEditorTab('team1')">
+              🔴 Câu hỏi Đội 1 (10 câu)
+            </button>
+            <button type="button" class="editor-tab-btn" id="tab-btn-t2" onclick="switchEditorTab('team2')">
+              🔵 Câu hỏi Đội 2 (10 câu)
+            </button>
+          </div>
+
+          <div id="editor-questions-list" style="max-height: 52vh; overflow-y: auto; padding-right: 4px;"></div>
+
+          <div style="display: flex; gap: 8px; margin-top: 14px;">
+            <button type="button" class="btn-primary" style="flex: 2; background: #2563eb;" onclick="saveEditorQuestions()">
+              💾 Lưu Bộ Câu Hỏi
+            </button>
+            <button type="button" class="icon-btn" style="flex: 1;" onclick="resetDefaultQuestions()">
+              🔄 Khôi phục mặc định
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         SETTINGS MODAL (CÀI ĐẶT LUẬT CHƠI)
+         ========================================================= -->
+    <div class="modal-overlay" id="settings-modal">
+      <div class="modal-dialog" style="max-width: 440px;">
+        <div class="modal-header">
+          <h3>⚙️ CÀI ĐẶT LUẬT THI ĐẤU</h3>
+          <button type="button" class="close-modal-btn" onclick="closeSettingsModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 800; margin-bottom: 6px;">
+              Lực kéo cờ mỗi câu trả lời đúng/sai (%):
+            </label>
+            <input type="number" class="input-text" id="setting-step-input" min="5" max="40" value="18" />
+            <span style="font-size: 11px; color: #64748b;">Mặc định là 18% (Khoảng 5 - 6 câu lệch là thắng Knock-out).</span>
+          </div>
+
+          <button type="button" class="btn-primary" onclick="saveSettings()">
+            💾 Áp Dụng Cài Đặt
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vanilla JS Application Logic -->
+    <script src="./app.js"></script>
+  </body>
+</html>

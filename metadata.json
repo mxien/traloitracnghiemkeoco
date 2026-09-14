@@ -1,0 +1,6 @@
+{
+  "name": "Đấu Trường Kéo Co Trắc Nghiệm",
+  "description": "Ứng dụng trò chơi kéo co trắc nghiệm 2 đội đối kháng với hoạt họa kéo dây sinh động, hiệu ứng âm thanh và câu hỏi trắc nghiệm A B C D.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
