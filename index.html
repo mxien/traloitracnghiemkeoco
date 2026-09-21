@@ -27,57 +27,114 @@
           <span>ĐẤU TRƯỜNG KÉO CO TRẮC NGHIỆM</span>
         </h1>
         <p class="app-subtitle">
-          Mỗi đội 10 câu trắc nghiệm. Trả lời sai bị đối thủ kéo cờ về phía họ; trả lời đúng giật cờ về phía mình!
+          Thời gian tổng trận đấu: <strong>2 phút</strong> · Mỗi câu: <strong>20 giây</strong>. Nếu hết 20 giây chưa có câu trả lời sẽ chuyển sang đội khác câu khác!
         </p>
       </header>
 
-      <!-- SCOREBOARD -->
-      <div class="scoreboard">
-        <!-- Đội 1 (Đỏ) -->
-        <div class="score-team">
-          <span class="score-dot dot-red"></span>
-          <div>
-            <div class="team-badge-title team1-text">Đội 1 (Đỏ)</div>
-            <div class="score-numbers">
-              <span id="t1-score-display" class="score-correct">0 đúng</span> · 
-              <span id="t1-wrong-display" class="score-wrong">0 sai</span>
+      <!-- MAIN NAVIGATION TABS: ĐẤU TRƯỜNG & QUẢN LÝ CÂU HỎI -->
+      <nav class="main-tabs-nav" aria-label="Chuyển đổi giao diện chính">
+        <button type="button" class="main-tab-btn active" id="tab-nav-game" onclick="switchMainTab('game')">
+          <span class="tab-btn-icon">⚔️</span>
+          <span>Đấu Trường Kéo Co</span>
+        </button>
+        <button type="button" class="main-tab-btn" id="tab-nav-manage" onclick="switchMainTab('manage')">
+          <span class="tab-btn-icon">📚</span>
+          <span>Quản Lý Câu Hỏi</span>
+          <span class="tab-badge" id="manage-tab-badge">20 câu</span>
+        </button>
+      </nav>
+
+      <!-- VIEW 1: ĐẤU TRƯỜNG KÉO CO -->
+      <main id="view-game" class="main-view active-view">
+        <!-- MATCH MODE BAR: 2 NGƯỜI CHƠI VS CHƠI VỚI MÁY -->
+        <div class="match-mode-selector-bar" id="match-mode-selector-bar">
+          <div class="mode-selector-main">
+            <span class="mode-bar-label">🎮 CHẾ ĐỘ THI ĐẤU:</span>
+            <div class="mode-pill-group">
+              <button type="button" class="mode-pill-btn active-mode" id="mode-btn-2p" onclick="setOpponentMode('two_players')">
+                <span>👥</span>
+                <span>2 Người Chơi (PvP)</span>
+              </button>
+              <button type="button" class="mode-pill-btn" id="mode-btn-bot" onclick="setOpponentMode('vs_bot')">
+                <span>🤖</span>
+                <span>Chơi Với Máy (Bot AI)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bot Difficulty Selector (Hiển thị khi chọn Chơi Với Máy) -->
+          <div class="bot-difficulty-wrapper" id="bot-difficulty-controls" style="display: none;">
+            <span class="diff-bar-label">Độ khó của Máy:</span>
+            <div class="diff-btn-group">
+              <button type="button" class="diff-btn" id="diff-easy" onclick="setBotDifficulty('easy')" title="Máy trả lời đúng ~50%">
+                🟢 Dễ (50%)
+              </button>
+              <button type="button" class="diff-btn active-diff" id="diff-medium" onclick="setBotDifficulty('medium')" title="Máy trả lời đúng ~75%">
+                🟡 Vừa (75%)
+              </button>
+              <button type="button" class="diff-btn" id="diff-hard" onclick="setBotDifficulty('hard')" title="Máy trả lời đúng ~90%">
+                🔴 Khó (90%)
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Center Turn Indicator -->
-        <div class="scoreboard-center">
-          <span id="match-turn-pill" class="turn-pill team1-turn">LƯỢT: ĐỘI 1 (ĐỎ)</span>
-        </div>
-
-        <!-- Đội 2 (Xanh) -->
-        <div class="score-team">
-          <div style="text-align: right;">
-            <div class="team-badge-title team2-text">Đội 2 (Xanh)</div>
-            <div class="score-numbers">
-              <span id="t2-score-display" class="score-correct">0 đúng</span> · 
-              <span id="t2-wrong-display" class="score-wrong">0 sai</span>
+        <!-- SCOREBOARD -->
+        <div class="scoreboard">
+          <!-- Đội 1 (Đỏ) -->
+          <div class="score-team">
+            <span class="score-dot dot-red"></span>
+            <div>
+              <div class="team-badge-title team1-text" id="t1-score-title">Đội 1 (Đỏ)</div>
+              <div class="score-numbers">
+                <span id="t1-score-display" class="score-correct">0 đúng</span> · 
+                <span id="t1-wrong-display" class="score-wrong">0 sai</span>
+              </div>
             </div>
           </div>
-          <span class="score-dot dot-blue"></span>
-        </div>
 
-        <!-- Controls -->
-        <div class="control-btn-group">
-          <button type="button" class="icon-btn" id="sound-toggle-btn" onclick="toggleSound()" title="Bật/Tắt âm thanh">
-            🔊 Âm thanh: Bật
-          </button>
-          <button type="button" class="icon-btn" onclick="openQuestionEditor()" title="Chỉnh sửa bộ 20 câu hỏi">
-            ✏️ Soạn câu hỏi
-          </button>
-          <button type="button" class="icon-btn" onclick="openSettingsModal()" title="Cài đặt luật kéo co">
-            ⚙️ Cài đặt
-          </button>
-          <button type="button" class="icon-btn" onclick="resetGame()" title="Chơi lại ván mới">
-            🔄 Chơi lại
-          </button>
+          <!-- Center Turn & Match Timer Indicator -->
+          <div class="scoreboard-center">
+            <div class="match-timer-box" id="match-timer-box" title="Thời gian tổng của trận đấu (Mặc định 2 phút)">
+              <div class="timer-tag-label">⏱️ TRẬN ĐẤU (2 PHÚT)</div>
+              <div class="timer-clock-row">
+                <span id="match-timer-display" class="timer-clock-digits">02:00</span>
+                <button type="button" class="timer-control-btn" id="timer-toggle-pause-btn" onclick="toggleMatchTimerPause()" title="Tạm dừng / Tiếp tục đồng hồ">
+                  ⏸️
+                </button>
+              </div>
+            </div>
+            <span id="match-turn-pill" class="turn-pill team1-turn">LƯỢT: ĐỘI 1 (ĐỎ)</span>
+          </div>
+
+          <!-- Đội 2 (Xanh) -->
+          <div class="score-team">
+            <div style="text-align: right;">
+              <div class="team-badge-title team2-text" id="t2-score-title">Đội 2 (Xanh)</div>
+              <div class="score-numbers">
+                <span id="t2-score-display" class="score-correct">0 đúng</span> · 
+                <span id="t2-wrong-display" class="score-wrong">0 sai</span>
+              </div>
+            </div>
+            <span class="score-dot dot-blue"></span>
+          </div>
+
+          <!-- Controls -->
+          <div class="control-btn-group">
+            <button type="button" class="icon-btn" id="sound-toggle-btn" onclick="toggleSound()" title="Bật/Tắt âm thanh">
+              🔊 Âm thanh: Bật
+            </button>
+            <button type="button" class="icon-btn" onclick="switchMainTab('manage')" title="Quản lý bộ câu hỏi (Thêm, Sửa, Xóa)">
+              📚 Quản lý câu hỏi
+            </button>
+            <button type="button" class="icon-btn" onclick="openSettingsModal()" title="Cài đặt luật kéo co">
+              ⚙️ Cài đặt
+            </button>
+            <button type="button" class="icon-btn" onclick="resetGame()" title="Chơi lại ván mới">
+              🔄 Chơi lại
+            </button>
+          </div>
         </div>
-      </div>
 
       <!-- MOBILE VIEW SWITCHER (< 768px) -->
       <div class="mobile-tabs" id="mobile-tabs-bar">
@@ -89,15 +146,22 @@
         </div>
       </div>
 
+      <!-- KEYBOARD SHORTCUT & AUTO-ADVANCE BANNER -->
+      <div class="keyboard-guide-bar">
+        <span class="kbd-guide-icon">⌨️</span>
+        <span><strong>Phím tắt nhanh:</strong> Bấm phím <kbd>A</kbd>, <kbd>B</kbd>, <kbd>C</kbd>, <kbd>D</kbd> trên bàn phím để trả lời ngay mà không cần dùng chuột!</span>
+        <span class="kbd-guide-auto">⚡ Tự động chuyển lượt sang đội khác sau khi trả lời</span>
+      </div>
+
       <!-- 3-COLUMN MAIN BATTLEFIELD:
            [BẢNG CÂU HỎI ĐỘI 1]  ---  [ĐẤU TRƯỜNG KÉO CO]  ---  [BẢNG CÂU HỎI ĐỘI 2]
       -->
       <div class="battlefield-grid">
         <!-- LEFT SIDE: BẢNG CÂU HỎI ĐỘI 1 (ĐỎ) -->
         <div class="question-card card-team1" id="card-team1">
-          <div class="card-top-banner banner-team1">
-            <span>📍 BẢNG ĐỘI 1 (BÊN TRÁI)</span>
-            <span>KÉO CỜ SANG TRÁI ⬅️</span>
+          <div class="card-top-banner banner-team1" id="t1-top-banner">
+            <span id="t1-banner-title">📍 BẢNG ĐỘI 1 (ĐỎ)</span>
+            <span id="t1-banner-status">⚡ ĐANG TRẢ LỜI</span>
           </div>
           <div class="card-inner">
             <div class="card-header-bar">
@@ -123,13 +187,13 @@
             <div class="arena-header-status">
               <div style="display: flex; align-items: center; gap: 6px;">
                 <span class="score-dot dot-red"></span>
-                <span class="team1-text">ĐỘI 1 (ĐỎ)</span>
+                <span class="team1-text" id="arena-t1-label">ĐỘI 1 (ĐỎ)</span>
               </div>
               <div class="flag-position-indicator" id="flag-meter-text">
                 ⚖️ Vạch giữa (0%)
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
-                <span class="team2-text">ĐỘI 2 (XANH)</span>
+                <span class="team2-text" id="arena-t2-label">ĐỘI 2 (XANH)</span>
                 <span class="score-dot dot-blue"></span>
               </div>
             </div>
@@ -211,14 +275,14 @@
 
         <!-- RIGHT SIDE: BẢNG CÂU HỎI ĐỘI 2 (XANH) -->
         <div class="question-card card-team2" id="card-team2">
-          <div class="card-top-banner banner-team2">
-            <span>📍 BẢNG ĐỘI 2 (BÊN PHẢI)</span>
-            <span>➡️ KÉO CỜ SANG PHẢI</span>
+          <div class="card-top-banner banner-team2" id="t2-top-banner">
+            <span id="t2-banner-title">📍 BẢNG ĐỘI 2 (XANH)</span>
+            <span id="t2-banner-status">💤 CHỜ LƯỢT</span>
           </div>
           <div class="card-inner">
             <div class="card-header-bar">
               <div class="team-info-block">
-                <h3 class="team2-text">Đội 2 (Xanh)</h3>
+                <h3 class="team2-text" id="t2-header-title">Đội 2 (Xanh)</h3>
                 <span class="progress-text" id="t2-progress-text">Câu 1 / 10</span>
               </div>
               <span class="turn-status-badge badge-waiting" id="t2-status-badge">Chờ lượt</span>
@@ -245,7 +309,102 @@
         </div>
         <div>Tự hào xây dựng với 100% HTML5, CSS3 và Vanilla JavaScript</div>
       </footer>
-    </div>
+    </main>
+
+    <!-- VIEW 2: QUẢN LÝ CÂU HỎI (THÊM, SỬA, XÓA) -->
+    <section id="view-manage" class="main-view" style="display: none;">
+      <div class="manage-card">
+        <!-- Manage Header -->
+        <div class="manage-header">
+          <div>
+            <div class="manage-title-row">
+              <span style="font-size: 26px;">📚</span>
+              <h2 class="manage-title">BẢNG QUẢN LÝ CÂU HỎI TRẮC NGHIỆM</h2>
+            </div>
+            <p class="manage-desc">
+              Thêm mới, chỉnh sửa nội dung, lựa chọn đáp án đúng và xóa câu hỏi cho Đội 1 (Đỏ) và Đội 2 (Xanh). Tự động lưu trên trình duyệt.
+            </p>
+          </div>
+
+          <div class="manage-header-actions">
+            <button type="button" class="btn-primary-action" onclick="addNewQuestionCurrentTab()">
+              <span>➕</span>
+              <span>Thêm Câu Hỏi Mới</span>
+            </button>
+            <button type="button" class="btn-success-action" onclick="saveAllQuestionsManually()">
+              <span>💾</span>
+              <span>Lưu Tất Cả</span>
+            </button>
+            <button type="button" class="btn-outline-action" onclick="switchMainTab('game')">
+              <span>⚔️</span>
+              <span>Vào Chơi Ngay</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Team Sub-tabs & Filter bar -->
+        <div class="manage-toolbar">
+          <div class="team-subtabs">
+            <button type="button" class="team-subtab-btn active-t1-tab" id="subtab-btn-t1" onclick="switchManageTeamTab('team1')">
+              <span class="score-dot dot-red"></span>
+              <span>Đội 1 (Đỏ)</span>
+              <span class="team-q-count-badge" id="mgr-badge-t1">10 câu</span>
+            </button>
+            <button type="button" class="team-subtab-btn" id="subtab-btn-t2" onclick="switchManageTeamTab('team2')">
+              <span class="score-dot dot-blue"></span>
+              <span>Đội 2 (Xanh)</span>
+              <span class="team-q-count-badge" id="mgr-badge-t2">10 câu</span>
+            </button>
+          </div>
+
+          <div class="toolbar-tools">
+            <!-- Search box -->
+            <div class="search-box">
+              <span>🔍</span>
+              <input type="text" id="manage-search-input" placeholder="Tìm kiếm câu hỏi..." oninput="handleManageSearch(this.value)" />
+            </div>
+            <button type="button" class="tool-btn" onclick="resetDefaultQuestionsConfirm()" title="Khôi phục 10 câu mẫu mặc định">
+              <span>🔄</span>
+              <span>Khôi phục mẫu</span>
+            </button>
+            <button type="button" class="tool-btn" onclick="exportQuestionsJson()" title="Tải xuống tệp câu hỏi JSON">
+              <span>📥</span>
+              <span>Xuất JSON</span>
+            </button>
+            <label class="tool-btn" style="cursor: pointer;" title="Nhập tệp câu hỏi JSON">
+              <span>📤</span>
+              <span>Nhập JSON</span>
+              <input type="file" id="import-json-file" accept=".json" style="display: none;" onchange="importQuestionsJson(event)" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Toast Notification for Management Tab -->
+        <div id="manage-toast-bar" class="manage-toast-bar" style="display: none;"></div>
+
+        <!-- Questions List Container -->
+        <div class="questions-list-container" id="manage-questions-container">
+          <!-- Dynamically populated cards via app.js -->
+        </div>
+
+        <!-- Footer of Manage view -->
+        <div class="manage-footer-bar">
+          <div id="manage-summary-text" class="manage-summary-text">
+            Đang hiển thị 10 câu hỏi của Đội 1 (Đỏ).
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-primary-action" onclick="addNewQuestionCurrentTab()">
+              <span>➕</span>
+              <span>Thêm Câu Hỏi</span>
+            </button>
+            <button type="button" class="btn-outline-action" onclick="switchMainTab('game')">
+              <span>⚔️ Quay Lại Sân Đấu</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 
     <!-- =========================================================
          VICTORY MODAL
@@ -263,11 +422,11 @@
 
           <div class="match-stats-grid">
             <div class="stat-card stat-t1">
-              <div style="font-size: 11px; font-weight: 800; color: #dc2626; text-transform: uppercase;">Đội 1 (Đỏ)</div>
+              <div style="font-size: 11px; font-weight: 800; color: #dc2626; text-transform: uppercase;" id="modal-t1-name">Đội 1 (Đỏ)</div>
               <div style="font-size: 16px; font-weight: 900; margin-top: 4px;" id="modal-t1-stat">0 đúng / 0 sai</div>
             </div>
             <div class="stat-card stat-t2">
-              <div style="font-size: 11px; font-weight: 800; color: #2563eb; text-transform: uppercase;">Đội 2 (Xanh)</div>
+              <div style="font-size: 11px; font-weight: 800; color: #2563eb; text-transform: uppercase;" id="modal-t2-name">Đội 2 (Xanh)</div>
               <div style="font-size: 16px; font-weight: 900; margin-top: 4px;" id="modal-t2-stat">0 đúng / 0 sai</div>
             </div>
           </div>
@@ -322,6 +481,54 @@
           <button type="button" class="close-modal-btn" onclick="closeSettingsModal()">×</button>
         </div>
         <div class="modal-body">
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: 13px; font-weight: 800; margin-bottom: 6px;">
+              🎮 Chế độ đối thủ:
+            </label>
+            <select id="setting-opponent-mode-select" class="input-text" style="font-weight: 700;" onchange="onSettingOpponentModeChange()">
+              <option value="two_players" selected>👥 2 Người Chơi (PvP - Cả 2 đội là người)</option>
+              <option value="vs_bot">🤖 Chơi Với Máy (PvE - Đội 2 do Bot AI điều khiển)</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 14px;" id="setting-bot-diff-row">
+            <label style="display: block; font-size: 13px; font-weight: 800; margin-bottom: 6px;">
+              🎯 Độ khó của Máy (Bot AI):
+            </label>
+            <select id="setting-bot-diff-select" class="input-text" style="font-weight: 700;">
+              <option value="easy">🟢 Dễ (Tỉ lệ trả lời đúng ~50%)</option>
+              <option value="medium" selected>🟡 Vừa (Tỉ lệ trả lời đúng ~75%)</option>
+              <option value="hard">🔴 Khó (Tỉ lệ trả lời đúng ~90%)</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: 13px; font-weight: 800; margin-bottom: 6px;">
+              ⏱️ Thời gian tổng trận đấu:
+            </label>
+            <select id="setting-match-time-select" class="input-text" style="font-weight: 700;">
+              <option value="60">1 phút (60 giây)</option>
+              <option value="120" selected>2 phút (120 giây) - Mặc định</option>
+              <option value="180">3 phút (180 giây)</option>
+              <option value="300">5 phút (300 giây)</option>
+            </select>
+            <span style="font-size: 11px; color: #64748b;">Khi hết giờ, đội nào kéo cờ lệch về phần sân mình hơn sẽ thắng cuộc.</span>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: 13px; font-weight: 800; margin-bottom: 6px;">
+              ⏳ Thời gian trả lời mỗi câu:
+            </label>
+            <select id="setting-question-time-select" class="input-text" style="font-weight: 700;">
+              <option value="10">10 giây</option>
+              <option value="15">15 giây</option>
+              <option value="20" selected>20 giây - Mặc định</option>
+              <option value="30">30 giây</option>
+              <option value="45">45 giây</option>
+            </select>
+            <span style="font-size: 11px; color: #64748b;">Hết 20 giây mà chưa trả lời sẽ chuyển lượt sang đội đối thủ trả lời câu khác.</span>
+          </div>
+
           <div style="margin-bottom: 16px;">
             <label style="display: block; font-size: 13px; font-weight: 800; margin-bottom: 6px;">
               Lực kéo cờ mỗi câu trả lời đúng/sai (%):
